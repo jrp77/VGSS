@@ -68,7 +68,7 @@ public class EnemyAI : MonoBehaviour
 
 		if(!_delay)
 		{
-			StartCoroutine("Patrol");
+			MarkPoints();
 		}
 
 		if(chasing)
@@ -78,17 +78,17 @@ public class EnemyAI : MonoBehaviour
 			minDist = 50;
 		}
 
-		if(enemy.position.x == patrolPoints[_nextPoint].position.x || enemy.position.z == patrolPoints[_nextPoint].position.z)
+		if(Vector3.Distance(enemy.position, patrolPoints[_nextPoint].position) < 0.4f)
 		{
-			moving = false;
-			_nextPoint++;
-			StartCoroutine("GoToPoint", _nextPoint);
+			StopCoroutine("Patrol");
+			StartCoroutine("ChangePoint");
 		}
 
 		if(_nextPoint == patrolPoints.Length && !moving)
 		{
 			_nextPoint = 0;
-			StartCoroutine("GoToPoint", _nextPoint);
+
+			StartCoroutine("Patrol", _nextPoint);
 		}
 	}
 
@@ -113,9 +113,9 @@ public class EnemyAI : MonoBehaviour
 	{
 		chasing = true;
 		patrolling = false;
-
+	
 		float step = moveSpeed * Time.deltaTime;
-
+	
 		if(Vector3.Distance(enemy.position, player.position) > attackRange)
 		{
 			enemy.position = Vector3.MoveTowards(enemy.position, player.position, step);
@@ -130,72 +130,62 @@ public class EnemyAI : MonoBehaviour
 		yield return new WaitForSeconds(patrolDelay);
 		_delay = false;
 		patrolling = true;
-		StartCoroutine("Patrol");
+		MarkPoints();
 	}
 
-	IEnumerator Patrol ()
+	void MarkPoints ()
 	{
-		//find the closest point and go to that point
-		if(patrolling)
+		if(!_pointsMarked)
 		{
-			if(!_pointsMarked)
+			for(int i = 0; i < patrolPoints.Length; i++)
 			{
-				for(int i = 0; i < patrolPoints.Length; i++)
-				{
-					float tempDist = Vector3.Distance(enemy.position, patrolPoints[i].position);
-					_distBtwPoints.Add(tempDist);
-				}
-
-				for(int i2 = 0; i2 < _distBtwPoints.Count; i2++)
-				{
-					float tempMin = _distBtwPoints[i2];
-
-					if(tempMin < minDist)
-					{
-						minDist = tempMin;
-					}
-				}
-
-				_pointsMarked = true;
+				float tempDist = Vector3.Distance(enemy.position, patrolPoints[i].position);
+				_distBtwPoints.Add(tempDist);
 			}
-			
+
+			for(int i2 = 0; i2 < _distBtwPoints.Count; i2++)
+			{
+				float tempMin = _distBtwPoints[i2];
+
+				if(tempMin < minDist)
+				{
+					minDist = tempMin;
+				}
+			}
+
+			_pointsMarked = true;
+
 			int fIndex = _distBtwPoints.IndexOf(minDist);
-			int currentPoint = fIndex;
-
-			NavMeshAgent nav = enemy.gameObject.GetComponent<NavMeshAgent>();
-			_nextPoint = currentPoint;
-			nav.destination = patrolPoints[currentPoint].position;
-			moving = true;
-
-			//if(enemy.position.x == patrolPoints[currentPoint].position.x || enemy.position.z == patrolPoints[currentPoint].position.z )
-			//{
-			//	moving = false;
-			//	Debug.Log("Waiting to go to next point");
-			//	yield return new WaitForSeconds (nextPointDelay);
-			//	currentPoint++;
-			//	_nextPoint = currentPoint;
-			//	nav.SetDestination(patrolPoints[currentPoint].position);
-			//	moving = true;
-			//}
-
-			//if(currentPoint == patrolPoints.Length && !moving)
-			//{
-			//	currentPoint = 0;
-			//	_nextPoint = currentPoint;
-			//	Debug.Log("Cycle completed, waiting to go to next point");
-			//	yield return new WaitForSeconds (nextPointDelay);
-			//	nav.SetDestination(patrolPoints[currentPoint].position);
-			//}
+			int minPoint = fIndex;
+			_nextPoint = minPoint;
+			
+			StartCoroutine("Patrol", _nextPoint);
 		}
+	}
+
+	IEnumerator Patrol (int point)
+	{
+		moving = true;
+		nav.SetDestination(patrolPoints[point].position);
 		yield return null;
 	}
 
-	IEnumerator GoToPoint (int pointIndex)
+	IEnumerator ChangePoint ()
 	{
+		if(_nextPoint < patrolPoints.Length)
+		{
+			_nextPoint += 1;
+		}
+
+		if(_nextPoint == patrolPoints.Length)
+		{
+			_nextPoint = 0;
+		}
+
 		moving = false;
-		Debug.Log("Waiting to go to next point");
-		yield return new WaitForSeconds (nextPointDelay);
-		nav.SetDestination(patrolPoints[pointIndex].position);
-		moving = true;
+		Debug.Log("Waiting for next point");
+		yield return new WaitForSeconds(nextPointDelay);
+		StartCoroutine("Patrol", _nextPoint);
 	}
+
 }
