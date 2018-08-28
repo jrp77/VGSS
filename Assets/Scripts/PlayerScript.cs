@@ -104,45 +104,6 @@ public class PlayerScript : MonoBehaviour
     
     void Move ()
     {
-        //float h = Mathf.Clamp(0f, 0f, 1f);
-        //float v = Mathf.Clamp(0f, 0f, 1f);
-
-        //if(Input.GetKey(moveUp) && v < 1f)
-        //{
-        //    v = v + accel;
-        //}
-
-        //if(Input.GetKey(moveDown) && v > -1f)
-        //{
-        //    v = v - accel;
-        //}
-
-        //if(Input.GetKey(moveRight) && h < 1f)
-        //{
-        //    h = h + accel;
-        //}
-
-        //if(Input.GetKey(moveLeft) && h > -1f)
-        //{
-        //    h = h - accel;
-        //}
-
-        //else
-        //{
-        //    if(v > decel)
-        //    {
-        //        v = v - decel;
-        //    }
-
-        //    if(v < -decel)
-        //    {
-        //        v = v + decel;
-        //    }
-        //}
-
-        //Vector3 moveCalc = new Vector3(h, 0f, v);
-        //currentVelocity = moveCalc;
-
         if(Input.GetKeyUp(moveUp) || Input.GetKeyUp(moveDown) || Input.GetKeyUp(moveLeft) || Input.GetKeyUp(moveRight))
         {
             player.isKinematic = true;
@@ -157,6 +118,7 @@ public class PlayerScript : MonoBehaviour
         {
             if(Input.GetKey(sprint))
             {
+                
                 player.velocity = new Vector3(0f, 0f, sprintSpeed);
             }
 

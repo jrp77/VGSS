@@ -5,52 +5,91 @@ using UnityEngine;
 public class PlayerAttack : MonoBehaviour 
 {
 	[Header("Basic Stuff")]
+	public GameObject player;
 	public Transform weapon;
+	public Transform[] attackPoints = new Transform[4];
+	private Transform _returnPoint;
+	private Transform _finalAttackPoint;
 	public float attackTime;
 	public int weaponDamage;
 	public bool attacking;
-	public Transform finalAttackPosition;
-	private float _rememberX;
-	private float _rememberY;
-	private MeshRenderer _mesh;
 
 	[Header("Keys")]
 	public KeyCode attackKey;
+
+	[Header("References")]
+	[SerializeField] private MeshRenderer _mesh;
+	[SerializeField] private PlayerScript _player;
 
 	void Start ()
 	{
 		_mesh = gameObject.GetComponent<MeshRenderer>();
 		_mesh.enabled = false;
+
+		_player = player.GetComponent<PlayerScript>();
+		Debug.Log("Component found");
 	}
 
 	void Update ()
 	{
-		if(Input.GetKeyDown(attackKey) && !attacking)
+		CheckForDirection();
+		CheckForAttack();
+
+		if(Input.GetKeyDown(attackKey))
 		{
 			attacking = true;
-			StartCoroutine("Attack");
 		}
 	}
 
-	IEnumerator Attack ()
+	void CheckForDirection ()
 	{
-		//enable mesh renderer
-		_rememberX = transform.position.x;
-		_rememberY = transform.position.y;
+		if(Input.GetKeyDown(_player.moveUp))
+		{
+			_returnPoint = attackPoints[0];
+			_finalAttackPoint = attackPoints[1];
+		}
 
-		_mesh.enabled = true;
+		else if(Input.GetKeyDown(_player.moveLeft))
+		{
+			_returnPoint = attackPoints[1];
+			_finalAttackPoint = attackPoints[2];
+		}
 
-		//go from right to left in certain amount of time
+		else if(Input.GetKeyDown(_player.moveDown))
+		{
+			_returnPoint = attackPoints[2];
+			_finalAttackPoint = attackPoints[3];
+		}
 
-		float t = 0f;
-		t += Time.deltaTime / attackTime;
-		transform.position = Vector3.Lerp(transform.position, finalAttackPosition.position, t);
+		else if(Input.GetKeyDown(_player.moveDown))
+		{
+			_returnPoint = attackPoints[3];
+			_finalAttackPoint = attackPoints[0];
+		}
 
-		//when it gets to the other end, turn off mesh renderer/reset position/set "attacking" to false
+		else
+		{
+			_returnPoint = attackPoints[0];
+			_finalAttackPoint = attackPoints[1];
+		}
+	}
 
-		yield return new WaitForSeconds(t);
-		_mesh.enabled = false;
-		transform.Translate(finalAttackPosition.position.x - _rememberX, finalAttackPosition.position.y - _rememberY, 0f);
-		attacking = false;
+	void CheckForAttack ()
+	{
+		if(attacking)
+		{
+			_mesh.enabled = true;
+			
+			float t = attackTime * Time.deltaTime;
+
+			weapon.position = Vector3.MoveTowards(weapon.position, _finalAttackPoint.position, t);
+
+			if(Vector3.Distance(weapon.position, _finalAttackPoint.position) < 0.1f)
+			{
+				_mesh.enabled = false;
+				weapon.position = _returnPoint.position;
+				attacking = false;
+			}
+		}
 	}
 }
