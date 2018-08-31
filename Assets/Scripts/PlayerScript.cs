@@ -129,14 +129,15 @@ public class PlayerScript : MonoBehaviour
         }
         else if(Input.GetKey(moveDown) && !player.isKinematic)
         {
-             if(Input.GetKey(sprint))
+
+            if(Input.GetKey(sprint))
             {
-                player.velocity = new Vector3(0f, 0f, -sprintSpeed);
+                player.velocity = new Vector3(0f, 0f, sprintSpeed);
             }
 
             else
             {
-                player.velocity = new Vector3(0f, 0f, -moveSpeed);
+                player.velocity = new Vector3(0f, 0f, moveSpeed);
             }
         }
         else if(Input.GetKey(moveLeft) && !player.isKinematic)

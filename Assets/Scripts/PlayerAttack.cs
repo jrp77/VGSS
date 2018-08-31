@@ -7,9 +7,9 @@ public class PlayerAttack : MonoBehaviour
 	[Header("Basic Stuff")]
 	public GameObject player;
 	public Transform weapon;
-	public Transform[] attackPoints = new Transform[4];
-	private Transform _returnPoint;
-	private Transform _finalAttackPoint;
+	public Transform[] directionPoints = new Transform[4];	//0 = up, 1 = down, 2 = left, 3 = right
+	public Transform returnPoint;
+	public Transform finalAttackPoint;
 	public float attackTime;
 	public int weaponDamage;
 	public bool attacking;
@@ -20,6 +20,12 @@ public class PlayerAttack : MonoBehaviour
 	[Header("References")]
 	[SerializeField] private MeshRenderer _mesh;
 	[SerializeField] private PlayerScript _player;
+
+	[Header("Direction Moving")]
+	[SerializeField] private bool _up;
+	[SerializeField] private bool _down;
+	[SerializeField] private bool _left;
+	[SerializeField] private bool _right;
 
 	void Start ()
 	{
@@ -32,8 +38,8 @@ public class PlayerAttack : MonoBehaviour
 
 	void Update ()
 	{
-		CheckForDirection();
 		CheckForAttack();
+		CheckForDirection();
 
 		if(Input.GetKeyDown(attackKey))
 		{
@@ -45,32 +51,14 @@ public class PlayerAttack : MonoBehaviour
 	{
 		if(Input.GetKeyDown(_player.moveUp))
 		{
-			_returnPoint = attackPoints[0];
-			_finalAttackPoint = attackPoints[1];
+			Vector3 upRot = Vector3.RotateTowards(_player.transform.position, directionPoints[0].position, 5, 0);
+			_player.transform.rotation = Quaternion.LookRotation(upRot);
 		}
 
-		else if(Input.GetKeyDown(_player.moveLeft))
+		if(Input.GetKeyDown(_player.moveDown))
 		{
-			_returnPoint = attackPoints[1];
-			_finalAttackPoint = attackPoints[2];
-		}
-
-		else if(Input.GetKeyDown(_player.moveDown))
-		{
-			_returnPoint = attackPoints[2];
-			_finalAttackPoint = attackPoints[3];
-		}
-
-		else if(Input.GetKeyDown(_player.moveDown))
-		{
-			_returnPoint = attackPoints[3];
-			_finalAttackPoint = attackPoints[0];
-		}
-
-		else
-		{
-			_returnPoint = attackPoints[0];
-			_finalAttackPoint = attackPoints[1];
+			Vector3 downRot = Vector3.RotateTowards(_player.transform.position, directionPoints[1].position, 5, 0);
+			_player.transform.rotation = Quaternion.LookRotation(downRot);
 		}
 	}
 
@@ -82,12 +70,12 @@ public class PlayerAttack : MonoBehaviour
 			
 			float t = attackTime * Time.deltaTime;
 
-			weapon.position = Vector3.MoveTowards(weapon.position, _finalAttackPoint.position, t);
+			weapon.position = Vector3.MoveTowards(weapon.position, finalAttackPoint.position, t);
 
-			if(Vector3.Distance(weapon.position, _finalAttackPoint.position) < 0.1f)
+			if(Vector3.Distance(weapon.position, finalAttackPoint.position) < 0.1f)
 			{
 				_mesh.enabled = false;
-				weapon.position = _returnPoint.position;
+				weapon.position = returnPoint.position;
 				attacking = false;
 			}
 		}
