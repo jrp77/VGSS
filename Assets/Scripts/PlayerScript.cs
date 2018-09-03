@@ -40,6 +40,7 @@ public class PlayerScript : MonoBehaviour
         _canMove = true;
 
         _maxHealth = health;
+
         _canTakeDmg = true;
 
         flickerRate = (damageOffset / flickerRepeat) / 2;
@@ -132,12 +133,12 @@ public class PlayerScript : MonoBehaviour
 
             if(Input.GetKey(sprint))
             {
-                player.velocity = new Vector3(0f, 0f, sprintSpeed);
+                player.velocity = new Vector3(0f, 0f, -sprintSpeed);
             }
 
             else
             {
-                player.velocity = new Vector3(0f, 0f, moveSpeed);
+                player.velocity = new Vector3(0f, 0f, -moveSpeed);
             }
         }
         else if(Input.GetKey(moveLeft) && !player.isKinematic)
