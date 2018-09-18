@@ -12,8 +12,7 @@ public class EnemyAI : MonoBehaviour
 
 	[Header("Player Detection")]
 	public Transform player;
-	public string playerTag;
-	[SerializeField] private bool _playerInArea;
+	public float recogDist;
 
 	[Header("Patrol")]
 	public float patrolDelay;
@@ -61,21 +60,9 @@ public class EnemyAI : MonoBehaviour
 
 	void Update ()
 	{
-		if(_playerInArea)
-		{
-			MoveToPlayer();
-		}
-
 		if(!_delay)
 		{
 			MarkPoints();
-		}
-
-		if(chasing)
-		{
-			_distBtwPoints.Clear();
-			_pointsMarked = false;
-			minDist = 50;
 		}
 
 		if(Vector3.Distance(enemy.position, patrolPoints[_nextPoint].position) < 0.4f)
@@ -90,47 +77,29 @@ public class EnemyAI : MonoBehaviour
 
 			StartCoroutine("Patrol", _nextPoint);
 		}
-	}
 
-	void OnTriggerEnter (Collider col)
-	{
-		if(col.gameObject.tag == playerTag)
+		if(Vector3.Distance(enemy.position, player.position) < recogDist)
 		{
-			_playerInArea = true;
-		}
-	}
+			_distBtwPoints.Clear();
+			_pointsMarked = false;
+			StopCoroutine("Patrol");
+			StopCoroutine("ChangePoint");
 
-	void OnTriggerExit (Collider col)
-	{
-		if(col.gameObject.tag == playerTag)
+			StartCoroutine("ChasePlayer");
+		}
+
+		else
 		{
-			_playerInArea = false;
-			StartCoroutine("DelayPatrol");
-		}
-	}
+			if(_pointsMarked)
+			{
+				StartCoroutine("Patrol");
+			}
 
-	void MoveToPlayer ()
-	{
-		chasing = true;
-		patrolling = false;
-	
-		float step = moveSpeed * Time.deltaTime;
-	
-		if(Vector3.Distance(enemy.position, player.position) > attackRange)
-		{
-			enemy.position = Vector3.MoveTowards(enemy.position, player.position, step);
+			else
+			{
+				MarkPoints();
+			}
 		}
-	}
-
-	IEnumerator DelayPatrol ()
-	{
-		chasing = false;
-		_delay = true;
-		Debug.Log("Chase stopped, delaying until patrol");
-		yield return new WaitForSeconds(patrolDelay);
-		_delay = false;
-		patrolling = true;
-		MarkPoints();
 	}
 
 	void MarkPoints ()
@@ -186,6 +155,11 @@ public class EnemyAI : MonoBehaviour
 		Debug.Log("Waiting for next point");
 		yield return new WaitForSeconds(nextPointDelay);
 		StartCoroutine("Patrol", _nextPoint);
+	}
+
+	IEnumerator ChasePlayer ()
+	{
+		
 	}
 
 }
