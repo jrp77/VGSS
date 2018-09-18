@@ -31,6 +31,11 @@ public class EnemyAI : MonoBehaviour
 	[SerializeField] private bool _delay;
 	[SerializeField] private int _nextPoint;
 
+	[Header("Stats")]
+	[SerializeField] private float _startTime;
+	[SerializeField] private float _journeyLength;
+	[SerializeField] private bool _chasing;
+
 	void Start ()
 	{
 		nav = enemy.GetComponent<NavMeshAgent>();
@@ -38,11 +43,6 @@ public class EnemyAI : MonoBehaviour
 		if(!enemy)
 		{
 			enemy = gameObject.GetComponent<Transform>();
-		}
-
-		if(!player)
-		{
-			player = GameObject.FindGameObjectWithTag(playerTag).GetComponent<Transform>();
 		}
 
 		_pointsMarked = false;
@@ -60,11 +60,6 @@ public class EnemyAI : MonoBehaviour
 
 	void Update ()
 	{
-		if(!_delay)
-		{
-			MarkPoints();
-		}
-
 		if(Vector3.Distance(enemy.position, patrolPoints[_nextPoint].position) < 0.4f)
 		{
 			StopCoroutine("Patrol");
@@ -78,29 +73,68 @@ public class EnemyAI : MonoBehaviour
 			StartCoroutine("Patrol", _nextPoint);
 		}
 
-		if(Vector3.Distance(enemy.position, player.position) < recogDist)
+		if(Vector3.Distance(enemy.position, player.position) <= recogDist)
 		{
 			_distBtwPoints.Clear();
 			_pointsMarked = false;
 			StopCoroutine("Patrol");
 			StopCoroutine("ChangePoint");
 
-			StartCoroutine("ChasePlayer");
+			Vector3 _startPosition = enemy.position;
+
+			_startTime = Time.time;
+			_journeyLength = Vector3.Distance(enemy.position, player.position);
+			
+			float distCovrd = (Time.time - _startTime) * moveSpeed;
+			float fracJourney = distCovrd / _journeyLength;
+			transform.position = Vector3.Lerp(_startPosition, player.position, fracJourney);
 		}
 
 		else
 		{
 			if(_pointsMarked)
 			{
-				StartCoroutine("Patrol");
+				StartCoroutine("Patrol", _nextPoint);
 			}
 
 			else
 			{
-				MarkPoints();
+				int nxt = nextPoint();
+				StartCoroutine("Patrol", nxt);
 			}
 		}
 	}
+
+	int nextPoint ()
+	{
+		if(!_pointsMarked)
+		{
+			for(int i = 0; i < patrolPoints.Length; i++)
+			{
+				float tempDist = Vector3.Distance(enemy.position, patrolPoints[i].position);
+				_distBtwPoints.Add(tempDist);
+			}
+
+			for(int i2 = 0; i2 < _distBtwPoints.Count; i2++)
+			{
+				float tempMin = _distBtwPoints[i2];
+
+				if(tempMin < minDist)
+				{
+						minDist = tempMin;
+				}
+			}
+
+			_pointsMarked = true;
+
+			int fIndex = _distBtwPoints.IndexOf(minDist);
+			_nextPoint = fIndex;
+		}
+
+		return _nextPoint;
+	}
+
+	/* Reworking to solve for a variable
 
 	void MarkPoints ()
 	{
@@ -132,6 +166,8 @@ public class EnemyAI : MonoBehaviour
 		}
 	}
 
+	*/
+
 	IEnumerator Patrol (int point)
 	{
 		moving = true;
@@ -156,10 +192,4 @@ public class EnemyAI : MonoBehaviour
 		yield return new WaitForSeconds(nextPointDelay);
 		StartCoroutine("Patrol", _nextPoint);
 	}
-
-	IEnumerator ChasePlayer ()
-	{
-		
-	}
-
 }

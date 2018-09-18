@@ -65,6 +65,11 @@ public class PlayerScript : MonoBehaviour
 
         currentHealth = health;
 
+        if(Input.GetKeyDown(KeyCode.L))
+        {
+            health--;
+        }
+
         if(health <= 0)
         {
             Dead();

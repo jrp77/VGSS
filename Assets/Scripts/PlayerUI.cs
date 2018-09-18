@@ -45,22 +45,23 @@ public class PlayerUI : MonoBehaviour
 
 			case 1:
 				healthImages[0].sprite = healthIcon;
+				healthImages[1].sprite = null;
+				healthImages[1].CrossFadeAlpha(0f, .01f, false);
+				healthImages[2].sprite = null;
+				healthImages[2].CrossFadeAlpha(0f, .01f, false);
 			break;
 
 			case 2:
-				int health2 = playerStats.health;
-				health2 -= 1;
-				for(int i = 0; i < health2; i++)
-				{
-					healthImages[i].sprite = healthIcon;
-				}
+				healthImages[0].sprite = healthIcon;
+				healthImages[1].sprite = healthIcon;
+				healthImages[2].sprite = null;
+				healthImages[2].CrossFadeAlpha(0f, .01f, false);
 			break;
 
 			case 3:
-				int health3 = playerStats.health;
-				for(int i = 0; i < health3; i++)
+				foreach(Image healthImg in healthImages)
 				{
-					healthImages[i].sprite = healthIcon;
+					healthImg.sprite = healthIcon;
 				}
 			break;
 		}
@@ -78,6 +79,39 @@ public class PlayerUI : MonoBehaviour
 		{
 			Time.timeScale = 0f;
 			return(true);
+		}
+	}
+
+	public void TriggerPauseWithButton (bool yes)
+	{
+		if(yes)
+		{
+			pauseMenu.gameObject.SetActive(false);
+			Time.timeScale = 1f;
+		}
+
+		else
+		{
+			pauseMenu.gameObject.SetActive(true);
+			Time.timeScale = 0f;
+		}
+	}
+
+	public void QuitGame (bool yes)
+	{
+		/*
+
+		#if UNITY_EDITOR
+         UnityEditor.EditorApplication.isPlaying = false;
+         #else
+         Application.Quit();
+         #endif
+
+		*/
+
+		if(yes)
+		{
+			Application.Quit();
 		}
 	}
 }
