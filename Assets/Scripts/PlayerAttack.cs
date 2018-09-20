@@ -14,6 +14,7 @@ public class PlayerAttack : MonoBehaviour
 	public int weaponDamage;
 	public bool attacking;
 	public string enemyTag;
+	[SerializeField] private bool _enemyInArea;
 
 	[Header("Keys")]
 	public KeyCode attackKey;
@@ -31,7 +32,7 @@ public class PlayerAttack : MonoBehaviour
 	{
 		if(Input.GetKeyDown(attackKey))
 		{
-			attacking = true;
+			StartCoroutine("Attack");
 		}
 	}
 
@@ -46,43 +47,28 @@ public class PlayerAttack : MonoBehaviour
 
 			else
 			{
-				StartCoroutine("Attack", null);
+				StartCoroutine("Attack", col.gameObject);
 			}
 		}
 	}
 
-	IEnumerator Attack (GameObject _obj)
+	IEnumerator Attack (GameObject _obj, bool _isEnemy)
 	{
 		if(!_obj)
 		{
-			Debug.Log("Attacking, but there is no object in the collider");
 			_mesh.enabled = true;
+			Debug.Log("No enemy in range, attacking anyways");
 			yield return new WaitForSeconds(attackTime);
 			_mesh.enabled = false;
 		}
 
 		else
 		{
-			bool _sent = false;
-
-			Debug.Log("Attacking, enemy in range, ID="+_obj.name);
 			_mesh.enabled = true;
-
-			if(!_sent)
-			{
-				_obj.SendMessage("TakeDamage", weaponDamage);
-				_sent = true;
-			}
-
-			else
-			{
-				Debug.Log("Redundant, already sent damage");
-			}
-
+			Debug.Log("Enemy in range, ID=" + _obj.name + ", attacking now and dealing " + weaponDamage.ToString());
+			_obj.SendMessage("TakeDamage", weaponDamage);
 			yield return new WaitForSeconds(attackTime);
-			_mesh.enabled = false;
-			_sent = false;
-			attacking = false;		
+			_mesh.enabled = false; 
 		}
 	}
 }

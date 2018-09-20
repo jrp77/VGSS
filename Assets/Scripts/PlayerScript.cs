@@ -68,6 +68,13 @@ public class PlayerScript : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.L))
         {
             health--;
+            Debug.Log("Health- = " + health.ToString());
+        }
+
+        if(Input.GetKeyDown(KeyCode.K))
+        {
+            health++;
+            Debug.Log("Health+ = " + health.ToString());
         }
 
         if(health <= 0)

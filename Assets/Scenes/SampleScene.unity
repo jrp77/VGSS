@@ -735,8 +735,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 554910374}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -2.67, y: 0.12, z: -1.19}
-  m_LocalScale: {x: 1.9075, y: 1.9075, z: 1.9075}
+  m_LocalPosition: {x: -2.515, y: 0.12, z: -1.328}
+  m_LocalScale: {x: 3, y: 3, z: 1.9075}
   m_Children: []
   m_Father: {fileID: 1072414106}
   m_RootOrder: 0
@@ -758,8 +758,9 @@ MonoBehaviour:
   weaponDamage: 0
   attacking: 0
   enemyTag: Enemy
+  _enemyInArea: 0
   attackKey: 32
-  _mesh: {fileID: 0}
+  _mesh: {fileID: 554910376}
 --- !u!1 &667184309
 GameObject:
   m_ObjectHideFlags: 0
@@ -1344,6 +1345,7 @@ GameObject:
   - component: {fileID: 1168790664}
   - component: {fileID: 1168790663}
   - component: {fileID: 1168790668}
+  - component: {fileID: 1168790667}
   m_Layer: 0
   m_Name: Quad
   m_TagString: Player
@@ -1421,6 +1423,24 @@ Transform:
   m_Father: {fileID: 44904539}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &1168790667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1168790662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5afe19720e012477486aed2009908eda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackTime: 0
+  radiusOfImpact: 0
+  attackKey: 0
+  playerScript: {fileID: 44904538}
+  _enemList: []
+  _playerDir: 0
+  _attacking: 0
 --- !u!54 &1168790668
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2197,8 +2217,7 @@ MonoBehaviour:
   moveSpeed: 3
   attackRange: 2
   player: {fileID: 1168790666}
-  playerTag: Player
-  _playerInArea: 0
+  recogDist: 0
   patrolDelay: 2
   patrolPoints:
   - {fileID: 1173052443}
@@ -2215,6 +2234,9 @@ MonoBehaviour:
   _pointsMarked: 0
   _delay: 0
   _nextPoint: 0
+  _startTime: 0
+  _journeyLength: 0
+  _chasing: 0
 --- !u!1 &1976668126
 GameObject:
   m_ObjectHideFlags: 0

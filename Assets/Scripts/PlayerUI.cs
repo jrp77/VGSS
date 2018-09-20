@@ -40,6 +40,10 @@ public class PlayerUI : MonoBehaviour
 		switch (playerStats.health)
 		{
 			case 0:
+				healthImages[0].sprite = null;
+				healthImages[1].sprite = null;
+				healthImages[2].sprite = null;
+				healthImages[0].CrossFadeAlpha(0f, .01f, false);
 				Debug.Log("PlayerDied");
 			break;
 
@@ -47,8 +51,8 @@ public class PlayerUI : MonoBehaviour
 				healthImages[0].sprite = healthIcon;
 				healthImages[1].sprite = null;
 				healthImages[1].CrossFadeAlpha(0f, .01f, false);
-				healthImages[2].sprite = null;
-				healthImages[2].CrossFadeAlpha(0f, .01f, false);
+				//healthImages[2].sprite = null;
+				//healthImages[2].CrossFadeAlpha(0f, .01f, false);
 			break;
 
 			case 2:
