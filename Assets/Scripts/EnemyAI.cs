@@ -9,12 +9,13 @@ public class EnemyAI : MonoBehaviour
 	public Transform enemy;
 	public float moveSpeed;
 	public float attackRange;
+	public int attackDamage;
+	public float attackTime;
 	public int health;
 
 	[Header("Player Detection")]
 	public Transform player;
 	public float recogDist;
-	public float stopDist;
 
 	[Header("Patrol")]
 	public float patrolDelay;
@@ -26,6 +27,7 @@ public class EnemyAI : MonoBehaviour
 	public float minDist;
 	public float nextPointDelay;
 	private NavMeshAgent nav;
+	private bool _attacking;
 
 	[Header("Play Mode Stats")]
 	[SerializeField] private List<float> _distBtwPoints;
@@ -42,12 +44,14 @@ public class EnemyAI : MonoBehaviour
 	{
 		Gizmos.color = new Color(0f, 1f, 0f, 0.5f);
 		Gizmos.DrawSphere(transform.position, recogDist);
-		Gizmos.DrawSphere(transform.position, stopDist);
+		Gizmos.DrawSphere(transform.position, attackRange);
 	}
 
 	void Start ()
 	{
 		nav = enemy.GetComponent<NavMeshAgent>();
+
+		_attacking = false;
 		
 		if(!enemy)
 		{
@@ -69,6 +73,13 @@ public class EnemyAI : MonoBehaviour
 
 	void Update ()
 	{
+		Debug.Log("Next point= " + _nextPoint.ToString());
+
+		if(_nextPoint < 0)
+		{
+			_nextPoint = 0;
+		}
+		
 		Debug.Log("Health = " + health.ToString());
 
 		if(Vector3.Distance(enemy.position, patrolPoints[_nextPoint].position) < 0.4f)
@@ -84,20 +95,22 @@ public class EnemyAI : MonoBehaviour
 			StartCoroutine("Patrol", _nextPoint);
 		}
 
-		if(Vector3.Distance(enemy.position, player.position) <= recogDist && Vector3.Distance(enemy.position, player.position) >= stopDist)
+		if(Vector3.Distance(enemy.position, player.position) <= recogDist && Vector3.Distance(enemy.position, player.position) >= attackRange)
 		{
 			patrolling = false;
 			chasing = true;
 			_pointsMarked = false;
+			_distBtwPoints.Clear();
 
 			nav.isStopped = false;
 			nav.SetDestination(player.position);
 		}
 
-		else if(Vector3.Distance(enemy.position, player.position) <= stopDist)
+		else if(Vector3.Distance(enemy.position, player.position) <= attackRange && !_attacking)
 		{
-			nav.isStopped = true;
+			_attacking = true;
 
+			nav.isStopped = true;
 			StartCoroutine("AttackPlayer");
 		}
 
@@ -221,5 +234,13 @@ public class EnemyAI : MonoBehaviour
 	public void TakeDamage (int damage)
 	{
 		health -= damage;
+	}
+
+	IEnumerator AttackPlayer ()
+	{
+		_attacking = true;
+		player.transform.parent.SendMessage("TakeDamage", attackDamage);
+		yield return new WaitForSeconds(attackTime);
+		_attacking = false;
 	}
 }
