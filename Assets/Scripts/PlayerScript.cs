@@ -200,7 +200,7 @@ public class PlayerScript : MonoBehaviour
 
     void Dead ()
     {
-        Debug.Log("Player dead");
+        Destroy(gameObject.transform.parent);
     }
 
     IEnumerator Dmg (int d)
