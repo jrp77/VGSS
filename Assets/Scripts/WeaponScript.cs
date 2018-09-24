@@ -15,6 +15,7 @@ public class WeaponScript : MonoBehaviour
 	[Header("General")]
 	public float attackTime;
 	public float radiusOfImpact;
+	public float weaponDamage;
 	public KeyCode attackKey;
 	public PlayerScript playerScript;
 	
@@ -51,6 +52,12 @@ public class WeaponScript : MonoBehaviour
 		}
 	}
 
+	void OnDrawGizmos ()
+	{
+		Gizmos.color = Color.yellow;
+		Gizmos.DrawSphere(transform.position, radiusOfImpact);
+	}
+
 	PlayerDirection findDirection (PlayerDirection dir)
 	{
 		if(Input.GetKeyDown(playerScript.moveUp))
@@ -67,18 +74,81 @@ public class WeaponScript : MonoBehaviour
 
 	void MarkEnemies ()
 	{
+		Debug.Log("Finding enemies to hit...");
 		Collider[] enem = Physics.OverlapSphere(transform.position, radiusOfImpact);
+		Debug.Log(enem.Length.ToString() + " objects found!");
 
-		for(int i = 0; i < enem.Length; i++)
+		if(_playerDir == PlayerDirection.Up)
 		{
-			_enemList.Add(enem[i].gameObject);
+			foreach(Collider _temp in enem)
+			{
+				if(_temp.gameObject.transform.position.y <= transform.position.y + radiusOfImpact && _temp.gameObject.transform.position.y >= transform.position.y);
+				{
+					_enemList.Add(_temp.gameObject);
+				}
+			}
+
+			Debug.Log("Found " + _enemList.Count.ToString() + " enemies! Sending attack message now...");
+
+			StartCoroutine("Swing");
 		}
 
-		Swing();
+		else if(_playerDir == PlayerDirection.Down)
+		{
+			foreach(Collider _temp in enem)
+			{
+				if(_temp.gameObject.transform.position.y <= transform.position.y - radiusOfImpact)
+				{
+					_enemList.Add(_temp.gameObject);
+				}
+			}
+
+			Debug.Log("Found " + _enemList.Count.ToString() + " enemies! Sending attack message now...");
+
+			StartCoroutine("Swing");
+		}
+
+		else if(_playerDir == PlayerDirection.Left)
+		{
+			foreach(Collider _temp in enem)
+			{
+				if(_temp.gameObject.transform.position.x <= transform.position.x - radiusOfImpact)
+				{
+					_enemList.Add(_temp.gameObject);
+				}
+			}
+
+			Debug.Log("Found " + _enemList.Count.ToString() + " enemies! Sending attack message now...");
+
+			StartCoroutine("Swing");
+		}
+		
+		else if(_playerDir == PlayerDirection.Right)
+		{
+			foreach(Collider _temp in enem)
+			{
+				if(_temp.gameObject.transform.position.x <= transform.position.x + radiusOfImpact)
+				{
+					_enemList.Add(_temp.gameObject);
+				}
+			}
+
+			Debug.Log("Found " + _enemList.Count.ToString() + " enemies! Sending attack message now...");
+
+			StartCoroutine("Swing");
+		}
 	}
 
-	void Swing ()
+	IEnumerator Swing ()
 	{
-		
+		foreach (GameObject enemies in _enemList)
+		{
+			enemies.SendMessage("TakeDamage", weaponDamage);
+		}
+
+		yield return new WaitForSeconds(attackTime);
+
+		_enemList.Clear();
+		_attacking = false;
 	}
 }

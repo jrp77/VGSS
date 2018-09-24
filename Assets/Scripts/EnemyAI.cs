@@ -9,6 +9,7 @@ public class EnemyAI : MonoBehaviour
 	public Transform enemy;
 	public float moveSpeed;
 	public float attackRange;
+	public int health;
 
 	[Header("Player Detection")]
 	public Transform player;
@@ -60,6 +61,8 @@ public class EnemyAI : MonoBehaviour
 
 	void Update ()
 	{
+		Debug.Log("Health = " + health.ToString());
+
 		if(Vector3.Distance(enemy.position, patrolPoints[_nextPoint].position) < 0.4f)
 		{
 			StopCoroutine("Patrol");
@@ -102,6 +105,11 @@ public class EnemyAI : MonoBehaviour
 				int nxt = nextPoint();
 				StartCoroutine("Patrol", nxt);
 			}
+		}
+
+		if(health <= 0)
+		{
+			Destroy(gameObject);
 		}
 	}
 
@@ -191,5 +199,10 @@ public class EnemyAI : MonoBehaviour
 		Debug.Log("Waiting for next point");
 		yield return new WaitForSeconds(nextPointDelay);
 		StartCoroutine("Patrol", _nextPoint);
+	}
+	
+	public void TakeDamage (int damage)
+	{
+		health -= damage;
 	}
 }
