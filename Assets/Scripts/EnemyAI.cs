@@ -14,6 +14,7 @@ public class EnemyAI : MonoBehaviour
 	[Header("Player Detection")]
 	public Transform player;
 	public float recogDist;
+	public float stopDist;
 
 	[Header("Patrol")]
 	public float patrolDelay;
@@ -36,6 +37,13 @@ public class EnemyAI : MonoBehaviour
 	[SerializeField] private float _startTime;
 	[SerializeField] private float _journeyLength;
 	[SerializeField] private bool _chasing;
+
+	void OnDrawGizmos ()
+	{
+		Gizmos.color = new Color(0f, 1f, 0f, 0.5f);
+		Gizmos.DrawSphere(transform.position, recogDist);
+		Gizmos.DrawSphere(transform.position, stopDist);
+	}
 
 	void Start ()
 	{
@@ -76,21 +84,30 @@ public class EnemyAI : MonoBehaviour
 			StartCoroutine("Patrol", _nextPoint);
 		}
 
-		if(Vector3.Distance(enemy.position, player.position) <= recogDist)
+		if(Vector3.Distance(enemy.position, player.position) <= recogDist && Vector3.Distance(enemy.position, player.position) >= stopDist)
 		{
-			_distBtwPoints.Clear();
+			patrolling = false;
+			chasing = true;
 			_pointsMarked = false;
-			StopCoroutine("Patrol");
-			StopCoroutine("ChangePoint");
 
-			Vector3 _startPosition = enemy.position;
+			nav.isStopped = false;
+			nav.SetDestination(player.position);
+		}
 
-			_startTime = Time.time;
-			_journeyLength = Vector3.Distance(enemy.position, player.position);
-			
-			float distCovrd = (Time.time - _startTime) * moveSpeed;
-			float fracJourney = distCovrd / _journeyLength;
-			transform.position = Vector3.Lerp(_startPosition, player.position, fracJourney);
+		else if(Vector3.Distance(enemy.position, player.position) <= stopDist)
+		{
+			nav.isStopped = true;
+
+			StartCoroutine("AttackPlayer");
+		}
+
+		else if(Vector3.Distance(enemy.position, player.position) >= recogDist && chasing)
+		{
+			patrolling = true;
+			chasing = false;
+
+			nav.isStopped = false;
+			StartCoroutine("Patrol", _nextPoint);
 		}
 
 		else
@@ -129,7 +146,7 @@ public class EnemyAI : MonoBehaviour
 
 				if(tempMin < minDist)
 				{
-						minDist = tempMin;
+					minDist = tempMin;
 				}
 			}
 
