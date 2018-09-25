@@ -10,7 +10,8 @@ public class PlayerScript : MonoBehaviour
     public float sprintSpeed;
     public float accel;
     public float decel;
-    private bool _canMove;
+    [SerializeField] private bool _canMove;
+    [SerializeField] private bool _canMoveDiag;
 
     [Header("Health")]
     public int health;
@@ -85,33 +86,42 @@ public class PlayerScript : MonoBehaviour
 
     void CheckForDiag ()
     {
-        if(Input.GetKey(moveUp) && Input.GetKey(moveLeft))
+        if(!_canMoveDiag)
         {
-            _canMove = false;
+            if(Input.GetKey(moveUp) && Input.GetKey(moveLeft))
+            {
+                _canMove = false;
+            }
+
+            else if(Input.GetKey(moveUp) && Input.GetKey(moveRight))
+            {
+                _canMove = false;
+            }
+
+            else if(Input.GetKey(moveUp) && Input.GetKey(moveDown))
+            {
+                _canMove = false;
+            }
+
+            else if(Input.GetKey(moveDown) && Input.GetKey(moveRight))
+            {
+                _canMove = false;
+            }
+
+            else if(Input.GetKey(moveDown) && Input.GetKey(moveLeft))
+            {
+                _canMove = false;
+            }
+
+            else
+            {  
+                _canMove = true;
+            }
         }
 
-        else if(Input.GetKey(moveUp) && Input.GetKey(moveRight))
+        else
         {
-            _canMove = false;
-        }
-
-        else if(Input.GetKey(moveUp) && Input.GetKey(moveDown))
-        {
-            _canMove = false;
-        }
-
-        else if(Input.GetKey(moveDown) && Input.GetKey(moveRight))
-        {
-            _canMove = false;
-        }
-
-        else if(Input.GetKey(moveDown) && Input.GetKey(moveLeft))
-        {
-            _canMove = false;
-        }
-
-        else{
-        _canMove = true;
+            _canMove = true;
         }
     }
     
@@ -130,9 +140,18 @@ public class PlayerScript : MonoBehaviour
         if(Input.GetKey(moveUp) && !player.isKinematic)
         {
             if(Input.GetKey(sprint))
-            {
-                
+            {   
                 player.velocity = new Vector3(0f, 0f, sprintSpeed);
+            }
+
+            else if(Input.GetKey(moveLeft) && _canMoveDiag)
+            {
+                player.velocity = new Vector3(-moveSpeed, 0f, moveSpeed/2);
+            }
+
+            else if(Input.GetKey(moveRight) && _canMoveDiag)
+            {
+                player.velocity = new Vector3(moveSpeed, 0f, moveSpeed/2);
             }
 
             else
@@ -142,10 +161,19 @@ public class PlayerScript : MonoBehaviour
         }
         else if(Input.GetKey(moveDown) && !player.isKinematic)
         {
-
             if(Input.GetKey(sprint))
             {
                 player.velocity = new Vector3(0f, 0f, -sprintSpeed);
+            }
+
+            else if(Input.GetKey(moveLeft) && _canMoveDiag)
+            {
+                player.velocity = new Vector3(-moveSpeed, 0f, -moveSpeed/2);
+            }
+
+            else if(Input.GetKey(moveRight) && _canMoveDiag)
+            {
+                player.velocity = new Vector3(moveSpeed, 0f, -moveSpeed/2);
             }
 
             else
