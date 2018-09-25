@@ -102,6 +102,8 @@ public class EnemyAI : MonoBehaviour
 			_pointsMarked = false;
 			_distBtwPoints.Clear();
 
+			minDist = Mathf.Infinity;
+
 			nav.isStopped = false;
 			nav.SetDestination(player.position);
 		}
@@ -116,11 +118,9 @@ public class EnemyAI : MonoBehaviour
 
 		else if(Vector3.Distance(enemy.position, player.position) >= recogDist && chasing)
 		{
-			patrolling = true;
 			chasing = false;
 
-			nav.isStopped = false;
-			StartCoroutine("Patrol", _nextPoint);
+			StartCoroutine("DelayPatrol");
 		}
 
 		else
@@ -242,5 +242,17 @@ public class EnemyAI : MonoBehaviour
 		player.transform.parent.SendMessage("TakeDamage", attackDamage);
 		yield return new WaitForSeconds(attackTime);
 		_attacking = false;
+	}
+
+	IEnumerator DelayPatrol ()
+	{
+		nav.isStopped = true;
+		_pointsMarked = false;
+		_distBtwPoints.Clear();
+		minDist = Mathf.Infinity;
+		yield return new WaitForSeconds(patrolDelay);
+		nav.isStopped = false;
+		int nxt = nextPoint();
+		StartCoroutine("Patrol", nxt);
 	}
 }
