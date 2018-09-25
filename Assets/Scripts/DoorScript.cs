@@ -5,14 +5,15 @@ using UnityEngine.SceneManagement;
 
 public class DoorScript : MonoBehaviour 
 {
-	public int sceneIndex;
+	public string sceneName;
 	public string playerTag;
 
 	void OnTriggerEnter (Collider col)
 	{
 		if(col.gameObject.tag == playerTag)
 		{
-			SceneManager.LoadScene(sceneIndex);
+			FadeScene fScene = GameObject.Find("_GM").GetComponent<FadeScene>();
+			fScene.Fade(true, sceneName);
 		}
 	}
 }

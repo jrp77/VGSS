@@ -35,11 +35,6 @@ public class EnemyAI : MonoBehaviour
 	[SerializeField] private bool _delay;
 	[SerializeField] private int _nextPoint;
 
-	[Header("Stats")]
-	[SerializeField] private float _startTime;
-	[SerializeField] private float _journeyLength;
-	[SerializeField] private bool _chasing;
-
 	void OnDrawGizmos ()
 	{
 		Gizmos.color = new Color(0f, 1f, 0f, 0.5f);
@@ -63,7 +58,7 @@ public class EnemyAI : MonoBehaviour
 		patrolling = true;
 		moving = false;
 
-		minDist = 50;
+		minDist = Mathf.Infinity;
 
 		foreach(Transform p in patrolPoints)
 		{
@@ -74,11 +69,6 @@ public class EnemyAI : MonoBehaviour
 	void Update ()
 	{
 		Debug.Log("Next point= " + _nextPoint.ToString());
-
-		if(_nextPoint < 0)
-		{
-			_nextPoint = 0;
-		}
 		
 		Debug.Log("Health = " + health.ToString());
 
@@ -119,8 +109,9 @@ public class EnemyAI : MonoBehaviour
 			patrolling = true;
 			chasing = false;
 
-			nav.isStopped = false;
-			StartCoroutine("Patrol", _nextPoint);
+			nav.isStopped = true;
+
+			StartCoroutine("DelayPatrol");
 		}
 
 		else
@@ -132,8 +123,7 @@ public class EnemyAI : MonoBehaviour
 
 			else
 			{
-				int nxt = nextPoint();
-				StartCoroutine("Patrol", nxt);
+				MarkPoints();
 			}
 		}
 
@@ -142,6 +132,8 @@ public class EnemyAI : MonoBehaviour
 			Destroy(gameObject);
 		}
 	}
+
+	/*
 
 	int nextPoint ()
 	{
@@ -172,7 +164,7 @@ public class EnemyAI : MonoBehaviour
 		return _nextPoint;
 	}
 
-	/* Reworking to solve for a variable
+	*/
 
 	void MarkPoints ()
 	{
@@ -203,8 +195,6 @@ public class EnemyAI : MonoBehaviour
 			StartCoroutine("Patrol", _nextPoint);
 		}
 	}
-
-	*/
 
 	IEnumerator Patrol (int point)
 	{
@@ -242,5 +232,13 @@ public class EnemyAI : MonoBehaviour
 		player.transform.parent.SendMessage("TakeDamage", attackDamage);
 		yield return new WaitForSeconds(attackTime);
 		_attacking = false;
+	}
+
+	IEnumerator DelayPatrol ()
+	{
+		_pointsMarked = false;
+		yield return new WaitForSeconds(patrolDelay);
+		nav.isStopped = false;
+		MarkPoints();
 	}
 }
