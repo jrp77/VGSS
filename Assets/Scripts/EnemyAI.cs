@@ -91,6 +91,7 @@ public class EnemyAI : MonoBehaviour
 			chasing = true;
 			_pointsMarked = false;
 			_distBtwPoints.Clear();
+			minDist = Mathf.Infinity;
 
 			nav.isStopped = false;
 			nav.SetDestination(player.position);
@@ -237,6 +238,7 @@ public class EnemyAI : MonoBehaviour
 	IEnumerator DelayPatrol ()
 	{
 		_pointsMarked = false;
+		minDist = Mathf.Infinity;
 		yield return new WaitForSeconds(patrolDelay);
 		nav.isStopped = false;
 		MarkPoints();
