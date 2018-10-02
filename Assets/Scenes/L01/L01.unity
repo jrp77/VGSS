@@ -640,7 +640,7 @@ Prefab:
     - target: {fileID: 2300002, guid: 62c77fc488f9249eabe65573e4f63850, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: b6d79af823d0b49a5a7e1d66d6026f9f, type: 2}
+      objectReference: {fileID: 2100000, guid: b2dd2e9e573c2f9439c8194212794a48, type: 2}
     - target: {fileID: 2300002, guid: 62c77fc488f9249eabe65573e4f63850, type: 3}
       propertyPath: m_Enabled
       value: 1
