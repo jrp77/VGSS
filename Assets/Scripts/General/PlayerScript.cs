@@ -10,6 +10,7 @@ public class PlayerScript : MonoBehaviour
     public float sprintSpeed;
     public float accel;
     public float decel;
+    public bool canSprint;
     [SerializeField] private bool _canMove;
     [SerializeField] private bool _canMoveDiag;
 
@@ -139,7 +140,7 @@ public class PlayerScript : MonoBehaviour
 
         if(Input.GetKey(moveUp) && !player.isKinematic)
         {
-            if(Input.GetKey(sprint))
+            if(Input.GetKey(sprint) && canSprint)
             {   
                 player.velocity = new Vector3(0f, 0f, sprintSpeed);
             }
@@ -161,7 +162,7 @@ public class PlayerScript : MonoBehaviour
         }
         else if(Input.GetKey(moveDown) && !player.isKinematic)
         {
-            if(Input.GetKey(sprint))
+            if(Input.GetKey(sprint) && canSprint)
             {
                 player.velocity = new Vector3(0f, 0f, -sprintSpeed);
             }
@@ -183,7 +184,7 @@ public class PlayerScript : MonoBehaviour
         }
         else if(Input.GetKey(moveLeft) && !player.isKinematic)
         {
-            if(Input.GetKey(sprint))
+            if(Input.GetKey(sprint) && canSprint)
             {
                 player.velocity = new Vector3(-sprintSpeed, 0f, 0f);
             }
@@ -196,7 +197,7 @@ public class PlayerScript : MonoBehaviour
             
         else if(Input.GetKey(moveRight) && !player.isKinematic)
         {
-            if(Input.GetKey(sprint))
+            if(Input.GetKey(sprint) && canSprint)
             {
                 player.velocity = new Vector3(sprintSpeed, 0f, 0f);
             }
