@@ -8,12 +8,26 @@ public class DoorScript : MonoBehaviour
 	public string sceneName;
 	public string playerTag;
 
+	private FadeScene _fScene;
+
+	void Start ()
+	{
+		_fScene = GameObject.Find("_GM").GetComponent<FadeScene>();
+	}
+
 	void OnTriggerEnter (Collider col)
 	{
 		if(col.gameObject.tag == playerTag)
 		{
-			FadeScene fScene = GameObject.Find("_GM").GetComponent<FadeScene>();
-			fScene.Fade(true, sceneName);
+			_fScene.StartCoroutine("Fade", sceneName);
+		}
+	}
+
+	void Update ()
+	{
+		if(_fScene.fadeComplete)
+		{
+			SceneManager.LoadScene(sceneName);
 		}
 	}
 }
