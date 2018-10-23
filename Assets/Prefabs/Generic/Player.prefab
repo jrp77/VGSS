@@ -190,6 +190,9 @@ MonoBehaviour:
   sprintSpeed: 6
   accel: 4
   decel: 1
+  canSprint: 0
+  _canMove: 0
+  _canMoveDiag: 0
   health: 3
   damageOffset: 1.5
   flickerRate: 0.1

@@ -221,9 +221,6 @@ MonoBehaviour:
   _pointsMarked: 0
   _delay: 0
   _nextPoint: 0
-  _startTime: 0
-  _journeyLength: 0
-  _chasing: 0
 --- !u!114 &114858274136764414
 MonoBehaviour:
   m_ObjectHideFlags: 1

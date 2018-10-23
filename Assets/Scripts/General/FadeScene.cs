@@ -6,48 +6,24 @@ using UnityEngine.SceneManagement;
 
 public class FadeScene : MonoBehaviour 
 {
-	public enum FadeMode {FadeIn, FadeOut};
-	public FadeMode fadeM;
 	public Image fadeImage;
 	public float fadeTime;
-	public bool isFading;
-	public bool fadeComplete;
-	public Animator anim;
+	public bool firstScene = false;
 
 	void Start ()
 	{
-		isFading = false;
-
-		fadeImage.color = new Color(0f, 0f, 0f, 0f);
-	}
-
-	void Update ()
-	{
-		if(isFading)
+		if(firstScene)
 		{
-			if(fadeM == FadeMode.FadeIn)
-			{
-				StartCoroutine("FadeIn");
-			}
-
-			else if(fadeM == FadeMode.FadeOut)
-			{
-				StartCoroutine("FadeOut");
-			}
-		}
-
-		else
-		{
-			Debug.Log("FadeScene Idle");
+			fadeImage.color = new Color(0f, 0f, 0f, 1f);
+			fadeImage.CrossFadeAlpha(0f, fadeTime / 2, false);
+			firstScene = false;
 		}
 	}
 
-	public IEnumerator Fade (string sceneName)
+	public IEnumerator ChangeScene (int buildInt)
 	{
-		Scene s = SceneManager.GetSceneByName(sceneName);
-
-		anim.SetTrigger("beginFade");
-		yield return new WaitForSeconds(fadeTime);
-		SceneManager.LoadScene(s.ToString());
+		fadeImage.CrossFadeAlpha(1f, fadeTime / 2, false);
+		yield return new WaitForSeconds(fadeTime / 2);
+		SceneManager.LoadScene(buildInt);
 	}
 }
